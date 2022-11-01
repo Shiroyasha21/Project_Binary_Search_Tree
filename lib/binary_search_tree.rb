@@ -17,28 +17,32 @@ end
 # The Tree class will accept an array
 class Tree
   include MergeSort
-  attr_accessor :arr, :root
+  attr_accessor :arr, :root_node
 
   def initialize(array)
     @arr = merge_sort(array)
-    build_tree(@arr)
+    @root_node = build_tree(@arr)
   end
 
-  def build_tree(array)
-    if array.length == 1
-      last = Node.new(array[0])
-      puts "(#{last.data})"
-      return array
-    end
-
+  def build_tree(array, node = nil)
     mid = array.length / 2
-    @root = array[mid]
-
-    test = Node.new(@root, build_tree(array[0, mid]), build_tree(array[mid + 1, (array.length - 1)]))
-    puts test.data
-    puts "#{test.l_child} - #{test.r_child}"
-    
+    if mid.zero?
+      node = Node.new(array[0])
+      return
+    end
+    root = array[mid]
+    left_n = array[0, mid]
+    right_n = array[mid + 1, array.length - 1]
+    node = Node.new(root, left_n, right_n)
+    build_tree(left_n, node)
+    build_tree(right_n, node)
+    node
   end
 end
 
-Tree.new([7,3,5,2,6,1,4])
+test = Tree.new([1,3,4,2,5,6,7])
+puts 'This is the root node'
+p test.root_node
+puts 'This is the root node data:'
+p test.root_node.data
+puts "This is right #{test.root_node.r_child} and left: #{test.root_node.l_child}"
