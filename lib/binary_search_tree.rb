@@ -24,25 +24,23 @@ class Tree
     @root_node = build_tree(@arr)
   end
 
-  def build_tree(array, node = nil)
+  def build_tree(array)
     mid = array.length / 2
-    if mid.zero?
-      node = Node.new(array[0])
-      return
-    end
     root = array[mid]
-    left_n = array[0, mid]
-    right_n = array[mid + 1, array.length - 1]
-    node = Node.new(root, left_n, right_n)
-    build_tree(left_n, node)
-    build_tree(right_n, node)
-    node
+
+    return root if array.length.zero?
+
+    left = build_tree(array[0, mid])
+    right = build_tree(array[mid + 1, array.length - 1])
+
+    Node.new(root, left, right)
   end
 end
 
 test = Tree.new([1,3,4,2,5,6,7])
-puts 'This is the root node'
-p test.root_node
-puts 'This is the root node data:'
-p test.root_node.data
-puts "This is right #{test.root_node.r_child} and left: #{test.root_node.l_child}"
+puts "This is the root node: #{test.root_node} and its data: #{test.root_node.data}"
+puts "This is the left child: #{test.root_node.l_child} and right child: #{test.root_node.r_child}"
+puts "And their respective data: #{test.root_node.l_child.data} & #{test.root_node.r_child.data}"
+puts ''
+puts "This is their child respectively: #{test.root_node.l_child.l_child} - #{test.root_node.l_child.r_child} AND #{test.root_node.r_child.l_child} - #{test.root_node.r_child.r_child}"
+puts "This is their child data respectively: #{test.root_node.l_child.l_child.data} - #{test.root_node.l_child.r_child.data} AND #{test.root_node.r_child.l_child.data} - #{test.root_node.r_child.r_child.data}"
