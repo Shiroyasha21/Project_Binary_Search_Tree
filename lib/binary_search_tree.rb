@@ -11,7 +11,17 @@ class Node
     @data = data
     @l_child = l_child
     @r_child = r_child
-  end 
+  end
+  
+  def child_size?
+    if l_child.nil? && r_child.nil?
+      0
+    elsif l_child && r_child
+      2
+    else
+      1
+    end
+  end
 end
 
 # The Tree class will accept an array
@@ -52,11 +62,7 @@ class Tree
       return
     end
 
-    if value < node.data
-      insert(value, node.l_child, node)
-    else
-      insert(value, node.r_child, node)
-    end
+    value < node.data ? insert(value, node.l_child, node) : insert(value, node.r_child, node)
   end
 
   def create_leaf_node(value, node)
@@ -68,9 +74,30 @@ class Tree
     end
   end
 
-  # def delete(value)
-  #   node = find(value)
-  # end
+  def delete(value, node = @root, prev = nil)
+    return false unless find(value)
+
+    if node.data == value
+      case node.child_size?
+      when 0
+        value < prev.data ? prev.l_child = nil : prev.r_child = nil
+      when 1
+        one_child_delete(value, node, prev)
+      else
+        puts 'two child'
+      end
+      return
+    end
+    value < node.data ? delete(value, node.l_child, node) : delete(value, node.r_child, node)
+  end
+
+  def one_child_delete(value, node, prev)
+    if value < prev.data
+      node.l_child.nil? ? prev.l_child = node.r_child : node.l_child
+    else
+      node.r_child.nil? ? prev.r_child = node.l_child : node.l_child
+    end
+  end
 
   def find(value, node = @root)
     return false if node.nil?
@@ -80,13 +107,6 @@ class Tree
   end
 end
 
-test = Tree.new([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324])
-# test = Tree.new([1,3,5,7,8,10]) error test
-test.pretty_print
-test.insert(15)
-test.insert(100)
-test.insert(10)
-test.insert(69)
-test.insert(6999)
-puts ''
-test.pretty_print
+#test = Tree.new([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324])
+test = Tree.new([1,3,5,7,8,10])
+test.delete(7)
