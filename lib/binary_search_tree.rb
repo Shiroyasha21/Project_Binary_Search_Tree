@@ -12,7 +12,7 @@ class Node
     @l_child = l_child
     @r_child = r_child
   end
-  
+
   def child_size
     if l_child.nil? && r_child.nil?
       0
@@ -74,6 +74,7 @@ class Tree
     end
   end
 
+  # The one and two child delete is relevant to this method
   def delete(value, node = @root, prev = nil)
     return false unless find(value)
 
@@ -118,8 +119,30 @@ class Tree
 
     value < node.data ? find(value, node.l_child) : find(value, node.r_child)
   end
+
+  def level_order(node = @root)
+    arr = [node.data]
+    node_arr = queue(node, arr)
+
+    level_order(q_arr[0], arr, q_arr)
+  end
+
+  def queue(node, arr, q_arr = [node])
+    return arr if node.nil?
+
+    q_arr.push(node.l_child)
+    q_arr.push(node.r_child)
+    arr.push(q_arr[0].l_child.data)
+    arr.push(q_arr[0].r_child.data)
+    q_arr.shift
+
+    queue(q_arr[0], arr, q_arr)
+  end
 end
 
-test = Tree.new([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324])
+# test = Tree.new([1,4,3,2])
+# test = Tree.new([7,5,1,3,4,2,6])
 # test = Tree.new([1,3,5,7,8,10])
+test = Tree.new([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324])
 test.pretty_print
+test.level_order
