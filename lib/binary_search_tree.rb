@@ -13,7 +13,7 @@ class Node
     @r_child = r_child
   end
   
-  def child_size?
+  def child_size
     if l_child.nil? && r_child.nil?
       0
     elsif l_child && r_child
@@ -78,15 +78,15 @@ class Tree
     return false unless find(value)
 
     if node.data == value
-      case node.child_size?
+      case node.child_size
       when 0
         value < prev.data ? prev.l_child = nil : prev.r_child = nil
       when 1
         one_child_delete(value, node, prev)
       else
-        puts 'two child'
+        two_child_delete(value, node)
       end
-      return
+      return node
     end
     value < node.data ? delete(value, node.l_child, node) : delete(value, node.r_child, node)
   end
@@ -99,6 +99,19 @@ class Tree
     end
   end
 
+  def two_child_delete(value, node)
+    min_node = right_minimum(value)
+    delete(min_node.data)
+
+    node.data = min_node.data
+  end
+
+  def right_minimum(value, node = find(value).r_child)
+    return node if node.child_size.zero?
+
+    right_minimum(value, node.l_child)
+  end
+
   def find(value, node = @root)
     return false if node.nil?
     return node if node.data == value
@@ -107,6 +120,6 @@ class Tree
   end
 end
 
-#test = Tree.new([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324])
-test = Tree.new([1,3,5,7,8,10])
-test.delete(7)
+test = Tree.new([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324])
+# test = Tree.new([1,3,5,7,8,10])
+test.pretty_print
