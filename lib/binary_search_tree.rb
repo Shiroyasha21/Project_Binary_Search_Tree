@@ -27,10 +27,11 @@ end
 # The Tree class will accept an array
 class Tree
   include MergeSort
-  attr_accessor :arr, :root
+  attr_accessor :arr, :root, :node_count
 
   def initialize(array)
     @arr = merge_sort(array).uniq
+    @node_count = 0
     @root = build_tree(@arr)
   end
 
@@ -43,6 +44,7 @@ class Tree
     left = build_tree(array[0, mid])
     right = build_tree(array[mid + 1, array.length - 1])
 
+    @node_count += 1
     Node.new(root, left, right)
   end
 
@@ -120,20 +122,29 @@ class Tree
     value < node.data ? find(value, node.l_child) : find(value, node.r_child)
   end
 
-  def level_order(node = @root)
+  def level_order(node = @root, &block)
     arr = [node.data]
     node_arr = queue(node, arr)
+    return node_arr unless block_given?
 
-    level_order(q_arr[0], arr, q_arr)
+    node_arr.each do |data|
+      block.call(data)
+    end
   end
 
   def queue(node, arr, q_arr = [node])
-    return arr if node.nil?
+    return arr if arr.length == @node_count
 
     q_arr.push(node.l_child)
     q_arr.push(node.r_child)
-    arr.push(q_arr[0].l_child.data)
-    arr.push(q_arr[0].r_child.data)
+
+    case q_arr[0].child_size
+    when 2
+      arr.push(q_arr[0].l_child.data)
+      arr.push(q_arr[0].r_child.data)
+    when 1
+      q_arr[0].l_child.data.nil? ? arr.push(q_arr[0].r_child.data) : arr.push(q_arr[0].l_child.data)
+    end
     q_arr.shift
 
     queue(q_arr[0], arr, q_arr)
@@ -144,5 +155,8 @@ end
 # test = Tree.new([7,5,1,3,4,2,6])
 # test = Tree.new([1,3,5,7,8,10])
 test = Tree.new([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324])
+# test = Tree.new([1,2,3,4,5,6,7,8,9])
+# test = Tree.new((Array.new(21) { rand(1..100) }))
 test.pretty_print
-test.level_order
+p test.level_order
+
