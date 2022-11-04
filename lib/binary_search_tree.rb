@@ -135,13 +135,11 @@ class Tree
   def queue(node, arr, q_arr = [node])
     return arr if arr.length == @node_count
 
-    q_arr.push(node.l_child)
-    q_arr.push(node.r_child)
+    q_arr.push(node.l_child, node.r_child)
 
     case q_arr[0].child_size
     when 2
-      arr.push(q_arr[0].l_child.data)
-      arr.push(q_arr[0].r_child.data)
+      arr.push(q_arr[0].l_child.data, q_arr[0].r_child.data)
     when 1
       q_arr[0].l_child.data.nil? ? arr.push(q_arr[0].r_child.data) : arr.push(q_arr[0].l_child.data)
     end
@@ -149,14 +147,62 @@ class Tree
 
     queue(q_arr[0], arr, q_arr)
   end
+
+  def inorder(node = @root, arr = [], &block)
+    return arr if node.nil?
+
+    inorder(node.l_child, arr)
+    arr << node.data
+    inorder(node.r_child, arr)
+
+    return arr unless block_given?
+
+    arr.each do |data|
+      block.call(data)
+    end
+  end
+
+  def preorder(node = @root, arr = [], &block)
+    return arr if node.nil?
+
+    arr << node.data
+    preorder(node.l_child, arr)
+    preorder(node.r_child, arr)
+
+    return arr unless block_given?
+
+    arr.each do |data|
+      block.call(data)
+    end
+  end
+
+  def postorder(node = @root, arr = [], &block)
+    return arr if node.nil?
+
+    postorder(node.l_child, arr)
+    postorder(node.r_child, arr)
+    arr << node.data
+
+    return arr unless block_given?
+
+    arr.each do |data|
+      block.call(data)
+    end
+  end
+
+  def height(node, steps = 0)
+    
+  end
 end
 
 # test = Tree.new([1,4,3,2])
-# test = Tree.new([7,5,1,3,4,2,6])
+#  test = Tree.new([7,5,1,3,4,2,6])
 # test = Tree.new([1,3,5,7,8,10])
-test = Tree.new([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324])
-# test = Tree.new([1,2,3,4,5,6,7,8,9])
+#test = Tree.new([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324])
+test = Tree.new([1,2,3,4,5,6,7,8,9])
 # test = Tree.new((Array.new(21) { rand(1..100) }))
 test.pretty_print
-p test.level_order
+node = test.find(3)
+puts test.height(node)
+
 
