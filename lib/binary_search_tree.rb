@@ -191,18 +191,23 @@ class Tree
   end
 
   def height(node, steps = 0)
-    
+    return -1 if node.nil?
+
+    left = height(node.l_child)
+    right = height(node.r_child)
+
+    left > right ? left + 1 : right + 1
   end
 end
 
 # test = Tree.new([1,4,3,2])
-#  test = Tree.new([7,5,1,3,4,2,6])
+# test = Tree.new([7,5,1,3,4,2,6])
 # test = Tree.new([1,3,5,7,8,10])
-#test = Tree.new([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324])
-test = Tree.new([1,2,3,4,5,6,7,8,9])
+test = Tree.new([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324])
+# test = Tree.new([1,2,3,4,5,6,7,8,9])
 # test = Tree.new((Array.new(21) { rand(1..100) }))
 test.pretty_print
-node = test.find(3)
+node = test.find(8)
 puts test.height(node)
 
 
