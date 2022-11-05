@@ -190,7 +190,6 @@ class Tree
 
   def level_order_height_recur(node = @root, &block)
     h = height(node)
-    puts "This is the height: #{h}"
     arr = []
 
     (1..h + 1).each do |level|
@@ -255,7 +254,7 @@ class Tree
     end
   end
 
-  def height(node, steps = 0)
+  def height(node)
     return -1 if node.nil?
 
     left = height(node.l_child)
@@ -263,15 +262,32 @@ class Tree
 
     left > right ? left + 1 : right + 1
   end
+
+  def depth(node, root = @root)
+    h = height(root)
+    arr = []
+
+    (1..h + 1).each do |level|
+      arr << push_current_level(root, level)
+    end
+    arr.each_with_index do |val, i|
+      val.each do |int|
+        return i if int == node.data
+      end
+    end
+  end
+
 end
 
 # test = Tree.new([1,4,3,2])
 # test = Tree.new([7,5,1,3,4,2,6])
-# test = Tree.new([1,3,5,7,8,10])
-test = Tree.new([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324])
+test = Tree.new([1,3,5,7,8,10])
+# test = Tree.new([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324])
 # test = Tree.new([1,2,3,4,5,6,7,8,9])
 # test = Tree.new((Array.new(21) { rand(1..100) }))
 test.pretty_print
+new = test.find(7)
+p test.depth(new)
 
 
 
