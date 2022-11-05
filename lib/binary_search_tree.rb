@@ -12,31 +12,20 @@ class Node
     @l_child = l_child
     @r_child = r_child
   end
-
-  def child_size
-    if l_child.nil? && r_child.nil?
-      0
-    elsif l_child && r_child
-      2
-    else
-      1
-    end
-  end
 end
 
 # The Tree class will accept an array
 class Tree
   include MergeSort
-  attr_accessor :arr, :root, :tree_size
+  attr_accessor :arr, :root
 
   def initialize(array)
     @arr = merge_sort(array).uniq
     @node_count = 0
     @root = build_tree(@arr)
-    @tree_size = size(@root)
   end
 
-  def size(node)
+  def size(node = @root)
     return 0 if node.nil?
 
     left = size(node.l_child)
@@ -90,7 +79,7 @@ class Tree
     return false unless find(value)
 
     if node.data == value
-      case node.child_size
+      case child_size(node)
       when 0
         value < prev.data ? prev.l_child = nil : prev.r_child = nil
       when 1
@@ -101,6 +90,16 @@ class Tree
       return node
     end
     value < node.data ? delete(value, node.l_child, node) : delete(value, node.r_child, node)
+  end
+
+  def child_size(node)
+    if node.l_child.nil? && node.r_child.nil?
+      0
+    elsif node.l_child && node.r_child
+      2
+    else
+      1
+    end
   end
 
   def one_child_delete(value, node, prev)
@@ -119,7 +118,7 @@ class Tree
   end
 
   def right_minimum(value, node = find(value).r_child)
-    return node if node.child_size.zero?
+    return node if child_size(node).zero?
 
     right_minimum(value, node.l_child)
   end
@@ -178,7 +177,7 @@ class Tree
     return arr if arr.length == @tree_size
 
     q_arr.push(node.l_child, node.r_child)
-    case q_arr[0].child_size
+    case child_size(q_arr[0])
     when 2
       arr.push(q_arr[0].l_child.data, q_arr[0].r_child.data)
     when 1
@@ -277,18 +276,36 @@ class Tree
     end
   end
 
+  def balanced?(node = @root, truthy_arr = [])
+    return if node.nil?
+
+    balanced?(node.l_child, truthy_arr)
+    balanced?(node.r_child, truthy_arr)
+
+    left = height(node.l_child)
+    right = height(node.r_child)
+
+    left > right ? truthy = left - right <= 1 : truthy = right - left <= 1
+
+    truthy_arr << truthy
+    truthy_arr.all?
+  end
 end
 
 # test = Tree.new([1,4,3,2])
 # test = Tree.new([7,5,1,3,4,2,6])
-test = Tree.new([1,3,5,7,8,10])
+# test = Tree.new([1,3,5,7,8,10])
 # test = Tree.new([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324])
 # test = Tree.new([1,2,3,4,5,6,7,8,9])
+test = Tree.new([1,5,25, 15, 50, 7, 35])
 # test = Tree.new((Array.new(21) { rand(1..100) }))
+test.insert(6)
+test.insert(2)
+test.insert(8)
+test.insert(3)
+test.insert(27)
 test.pretty_print
-new = test.find(7)
-p test.depth(new)
-
+p test.balanced?
 
 
 
