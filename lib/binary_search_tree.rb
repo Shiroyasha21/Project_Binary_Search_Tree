@@ -27,12 +27,22 @@ end
 # The Tree class will accept an array
 class Tree
   include MergeSort
-  attr_accessor :arr, :root, :node_count
+  attr_accessor :arr, :root, :tree_size
 
   def initialize(array)
     @arr = merge_sort(array).uniq
     @node_count = 0
     @root = build_tree(@arr)
+    @tree_size = size(@root)
+  end
+
+  def size(node)
+    return 0 if node.nil?
+
+    left = size(node.l_child)
+    right = size(node.r_child)
+
+    left + right + 1
   end
 
   def build_tree(array)
@@ -44,7 +54,6 @@ class Tree
     left = build_tree(array[0, mid])
     right = build_tree(array[mid + 1, array.length - 1])
 
-    @node_count += 1
     Node.new(root, left, right)
   end
 
@@ -122,7 +131,7 @@ class Tree
     value < node.data ? find(value, node.l_child) : find(value, node.r_child)
   end
 
-  def level_order(node = @root, &block)
+  def level_order_iterative(node = @root, &block)
     arr = []
     queue_arr = []
     level_arr = queue(node, arr, queue_arr)
@@ -135,23 +144,73 @@ class Tree
   end
 
   def queue(node, arr, queue_arr)
-    if node.nil
+    return if node.nil?
 
+    # Push the node to the queue
     queue_arr << node
-
-    while !queue_arr.length.zero?
+    until queue_arr.length.zero?
       current_node = queue_arr[0]
       arr << current_node.data
-
-      if !current_node.l_child.nil? 
+      unless current_node.l_child.nil?
         queue_arr.push(current_node.l_child)
       end
-      if !current_node.r_child.nil?
+      unless current_node.r_child.nil?
         queue_arr.push(current_node.r_child)
       end
+      # Remove the node to the queue after adding its child to the queue
       queue_arr.shift
     end
     arr
+  end
+
+  # A recursive method that use the size of the tree
+  def level_order_recur(node = @root, &block)
+    arr = [node.data]
+    node_arr = queue_recur(node, arr)
+    return node_arr unless block_given?
+
+    node_arr.each do |data|
+      block.call(data)
+    end
+  end
+
+  def queue_recur(node, arr, q_arr = [node])
+    return arr if arr.length == @tree_size
+
+    q_arr.push(node.l_child, node.r_child)
+    case q_arr[0].child_size
+    when 2
+      arr.push(q_arr[0].l_child.data, q_arr[0].r_child.data)
+    when 1
+      q_arr[0].l_child.data.nil? ? arr.push(q_arr[0].r_child.data) : arr.push(q_arr[0].l_child.data)
+    end
+    q_arr.shift
+    queue_recur(q_arr[0], arr, q_arr)
+  end
+
+  def level_order_height_recur(node = @root, &block)
+    h = height(node)
+    puts "This is the height: #{h}"
+    arr = []
+
+    (1..h + 1).each do |level|
+      data = push_current_level(node, level)
+      data.each { |val| arr << val }
+    end
+    return arr unless block_given?
+
+    arr.each { |data| block.call(data) }
+  end
+
+  def push_current_level(node, level, arr = [])
+    return arr if node.nil?
+
+    if level == 1
+      arr << node.data
+    elsif level > 1
+      push_current_level(node.l_child, level - 1, arr)
+      push_current_level(node.r_child, level - 1, arr)
+    end
   end
 
   def inorder(node = @root, arr = [], &block)
@@ -213,6 +272,7 @@ test = Tree.new([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324])
 # test = Tree.new([1,2,3,4,5,6,7,8,9])
 # test = Tree.new((Array.new(21) { rand(1..100) }))
 test.pretty_print
-p test.level_order
+
+
 
 
