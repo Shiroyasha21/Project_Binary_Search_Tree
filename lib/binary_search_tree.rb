@@ -123,29 +123,35 @@ class Tree
   end
 
   def level_order(node = @root, &block)
-    arr = [node.data]
-    node_arr = queue(node, arr)
-    return node_arr unless block_given?
+    arr = []
+    queue_arr = []
+    level_arr = queue(node, arr, queue_arr)
 
-    node_arr.each do |data|
+    return level_arr unless block_given?
+
+    level_arr.each do |data|
       block.call(data)
     end
   end
 
-  def queue(node, arr, q_arr = [node])
-    return arr if arr.length == @node_count
+  def queue(node, arr, queue_arr)
+    if node.nil
 
-    q_arr.push(node.l_child, node.r_child)
+    queue_arr << node
 
-    case q_arr[0].child_size
-    when 2
-      arr.push(q_arr[0].l_child.data, q_arr[0].r_child.data)
-    when 1
-      q_arr[0].l_child.data.nil? ? arr.push(q_arr[0].r_child.data) : arr.push(q_arr[0].l_child.data)
+    while !queue_arr.length.zero?
+      current_node = queue_arr[0]
+      arr << current_node.data
+
+      if !current_node.l_child.nil? 
+        queue_arr.push(current_node.l_child)
+      end
+      if !current_node.r_child.nil?
+        queue_arr.push(current_node.r_child)
+      end
+      queue_arr.shift
     end
-    q_arr.shift
-
-    queue(q_arr[0], arr, q_arr)
+    arr
   end
 
   def inorder(node = @root, arr = [], &block)
@@ -207,7 +213,6 @@ test = Tree.new([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324])
 # test = Tree.new([1,2,3,4,5,6,7,8,9])
 # test = Tree.new((Array.new(21) { rand(1..100) }))
 test.pretty_print
-node = test.find(8)
-puts test.height(node)
+p test.level_order
 
 
