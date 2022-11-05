@@ -1,18 +1,7 @@
 # frozen_string_literal: false
 
 require_relative 'merge_sort_mod'
-
-# Contains the nodes to store data and its children
-class Node
-  include Comparable
-  attr_accessor :data, :l_child, :r_child
-
-  def initialize(data, l_child = nil, r_child = nil)
-    @data = data
-    @l_child = l_child
-    @r_child = r_child
-  end
-end
+require_relative 'node'
 
 # The Tree class will accept an array
 class Tree
@@ -163,31 +152,7 @@ class Tree
   end
 
   # A recursive method that use the size of the tree
-  def level_order_recur(node = @root, &block)
-    arr = [node.data]
-    node_arr = queue_recur(node, arr)
-    return node_arr unless block_given?
-
-    node_arr.each do |data|
-      block.call(data)
-    end
-  end
-
-  def queue_recur(node, arr, q_arr = [node])
-    return arr if arr.length == @tree_size
-
-    q_arr.push(node.l_child, node.r_child)
-    case child_size(q_arr[0])
-    when 2
-      arr.push(q_arr[0].l_child.data, q_arr[0].r_child.data)
-    when 1
-      q_arr[0].l_child.data.nil? ? arr.push(q_arr[0].r_child.data) : arr.push(q_arr[0].l_child.data)
-    end
-    q_arr.shift
-    queue_recur(q_arr[0], arr, q_arr)
-  end
-
-  def level_order_height_recur(node = @root, &block)
+  def level_order(node = @root, &block)
     h = height(node)
     arr = []
 
@@ -220,9 +185,7 @@ class Tree
 
     return arr unless block_given?
 
-    arr.each do |data|
-      block.call(data)
-    end
+    arr.each { |val| block.call(val)}
   end
 
   def preorder(node = @root, arr = [], &block)
@@ -234,9 +197,7 @@ class Tree
 
     return arr unless block_given?
 
-    arr.each do |data|
-      block.call(data)
-    end
+    arr.each { |val| block.call(val)}
   end
 
   def postorder(node = @root, arr = [], &block)
@@ -248,9 +209,7 @@ class Tree
 
     return arr unless block_given?
 
-    arr.each do |data|
-      block.call(data)
-    end
+    arr.each { |val| block.call(val)}
   end
 
   def height(node)
@@ -290,22 +249,9 @@ class Tree
     truthy_arr << truthy
     truthy_arr.all?
   end
+
+  def rebalance
+    new_arr = inorder()
+    @root = build_tree(new_arr)
+  end
 end
-
-# test = Tree.new([1,4,3,2])
-# test = Tree.new([7,5,1,3,4,2,6])
-# test = Tree.new([1,3,5,7,8,10])
-# test = Tree.new([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324])
-# test = Tree.new([1,2,3,4,5,6,7,8,9])
-test = Tree.new([1,5,25, 15, 50, 7, 35])
-# test = Tree.new((Array.new(21) { rand(1..100) }))
-test.insert(6)
-test.insert(2)
-test.insert(8)
-test.insert(3)
-test.insert(27)
-test.pretty_print
-p test.balanced?
-
-
-
