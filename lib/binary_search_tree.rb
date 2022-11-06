@@ -10,20 +10,15 @@ class Tree
 
   def initialize(array)
     @arr = merge_sort(array).uniq
-    @node_count = 0
     @root = build_tree(@arr)
   end
 
-  def size(node = @root)
-    return 0 if node.nil?
-
-    left = size(node.l_child)
-    right = size(node.r_child)
-
-    left + right + 1
-  end
+  # Take an array and turn create a tree of nodes with its elements
+  # #build_tree returns the root node of the tree
 
   def build_tree(array)
+    return nil if array.empty?
+
     mid = array.length / 2
     root = array[mid]
 
@@ -42,6 +37,7 @@ class Tree
     pretty_print(node.l_child, "#{prefix}#{is_left ? '    ' : '│   '}", true) if node.l_child
   end
 
+  # Take a value and insert it in the tree. Can be optimized to a shorter algo
   def insert(value, node = @root, prev = nil)
     if node.nil?
       create_leaf_node(value, prev)
@@ -117,38 +113,6 @@ class Tree
     return node if node.data == value
 
     value < node.data ? find(value, node.l_child) : find(value, node.r_child)
-  end
-
-  def level_order_iterative(node = @root, &block)
-    arr = []
-    queue_arr = []
-    level_arr = queue(node, arr, queue_arr)
-
-    return level_arr unless block_given?
-
-    level_arr.each do |data|
-      block.call(data)
-    end
-  end
-
-  def queue(node, arr, queue_arr)
-    return if node.nil?
-
-    # Push the node to the queue
-    queue_arr << node
-    until queue_arr.length.zero?
-      current_node = queue_arr[0]
-      arr << current_node.data
-      unless current_node.l_child.nil?
-        queue_arr.push(current_node.l_child)
-      end
-      unless current_node.r_child.nil?
-        queue_arr.push(current_node.r_child)
-      end
-      # Remove the node to the queue after adding its child to the queue
-      queue_arr.shift
-    end
-    arr
   end
 
   # A recursive method that use the size of the tree
